@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이니셜 형용사 사전</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+        .alphabet-btn {
+            transition: all 0.2s;
+        }
+        .alphabet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .active-letter {
+            background-color: #3b82f6 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">✨ 나만의 이니셜 형용사 찾기</h1>
+            <p class="text-slate-600">이름의 첫 글자를 클릭해서 자신을 표현할 멋진 영단어를 골라보세요!</p>
+        </header>
+
+        <!-- 알파벳 그리드 -->
+        <div class="grid grid-cols-6 sm:grid-cols-9 md:grid-cols-13 gap-2 mb-12" id="alphabet-grid">
+            <!-- 자바스크립트로 생성됨 -->
+        </div>
+
+        <!-- 결과 표시 영역 -->
+        <div id="result-container" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100">
+            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
+                <span id="selected-letter" class="text-5xl font-black text-blue-600">A</span>
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">로 시작하는 형용사</h2>
+                    <p class="text-sm text-slate-500">마음에 드는 단어를 골라 이름 앞에 붙여보세요.</p>
+                </div>
+            </div>
+            
+            <div id="adjective-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 형용사 리스트가 여기에 렌더링됨 -->
+            </div>
+        </div>
+
+        <div id="placeholder" class="text-center py-20 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400">
+            위의 알파벳을 클릭하면 형용사 목록이 나타납니다.
+        </div>
+    </div>
+
+    <script>
+        const adjectivesData = {
+            'A': [
+                { word: 'Amazing', mean: '놀라운' }, { word: 'Active', mean: '활동적인' }, { word: 'Adventurous', mean: '모험심 강한' }, { word: 'Ambitious', mean: '야심 찬' }, { word: 'Amiable', mean: '상냥한' },
+                { word: 'Artistic', mean: '예술적인' }, { word: 'Attentive', mean: '주의 깊은' }, { word: 'Authentic', mean: '진실된' }, { word: 'Awesome', mean: '굉장한' }, { word: 'Affectionate', mean: '다정한' }
+            ],
+            'B': [
+                { word: 'Brave', mean: '용감한' }, { word: 'Bright', mean: '똑똑한/밝은' }, { word: 'Brilliant', mean: '훌륭한' }, { word: 'Bold', mean: '대담한' }, { word: 'Beautiful', mean: '아름다운' },
+                { word: 'Benevolent', mean: '자비로운' }, { word: 'Blissful', mean: '행복에 가득 찬' }, { word: 'Bouncy', mean: '활기찬' }, { word: 'Breathtaking', mean: '숨 막히게 멋진' }, { word: 'Balanced', mean: '균형 잡힌' }
+            ],
+            'C': [
+                { word: 'Creative', mean: '창의적인' }, { word: 'Cheerful', mean: '쾌활한' }, { word: 'Confident', mean: '자신감 있는' }, { word: 'Calm', mean: '차분한' }, { word: 'Caring', mean: '배려심 깊은' },
+                { word: 'Clever', mean: '영리한' }, { word: 'Courageous', mean: '용기 있는' }, { word: 'Curious', mean: '호기심 많은' }, { word: 'Charming', mean: '매력적인' }, { word: 'Considerate', mean: '사려 깊은' }
+            ],
+            'D': [
+                { word: 'Dreamy', mean: '꿈결 같은' }, { word: 'Diligent', mean: '부지런한' }, { word: 'Decisive', mean: '결단력 있는' }, { word: 'Delightful', mean: '기분 좋은' }, { word: 'Dazzling', mean: '눈부신' },
+                { word: 'Dynamic', mean: '역동적인' }, { word: 'Devoted', mean: '헌신적인' }, { word: 'Determined', mean: '의지가 굳은' }, { word: 'Discrete', mean: '신중한' }, { word: 'Diplomatic', mean: '수완이 좋은' }
+            ],
+            'E': [
+                { word: 'Energetic', mean: '에너지 넘치는' }, { word: 'Elegant', mean: '우아한' }, { word: 'Enthusiastic', mean: '열정적인' }, { word: 'Empathetic', mean: '공감 능력이 좋은' }, { word: 'Excellent', mean: '탁월한' },
+                { word: 'Expressive', mean: '표현력이 풍부한' }, { word: 'Easy-going', mean: '성격이 원만한' }, { word: 'Earnest', mean: '진지한/성실한' }, { word: 'Enlightened', mean: '계몽된/깨어있는' }, { word: 'Extraordinary', mean: '비범한' }
+            ],
+            'F': [
+                { word: 'Friendly', mean: '우호적인' }, { word: 'Fantastic', mean: '환상적인' }, { word: 'Faithful', mean: '충실한' }, { word: 'Fearless', mean: '두려움 없는' }, { word: 'Focused', mean: '집중력 있는' },
+                { word: 'Flexible', mean: '유연한' }, { word: 'Funny', mean: '재미있는' }, { word: 'Fabulous', mean: '기막히게 좋은' }, { word: 'Frank', mean: '솔직한' }, { word: 'Forgiving', mean: '너그러운' }
+            ],
+            'G': [
+                { word: 'Gentle', mean: '온화한' }, { word: 'Generous', mean: '관대한' }, { word: 'Gifted', mean: '재능 있는' }, { word: 'Grateful', mean: '감사하는' }, { word: 'Genuine', mean: '진실한' },
+                { word: 'Glowing', mean: '빛나는' }, { word: 'Graceful', mean: '품위 있는' }, { word: 'Grand', mean: '웅장한/위엄 있는' }, { word: 'Great', mean: '위대한' }, { word: 'Gregarious', mean: '사교적인' }
+            ],
+            'H': [
+                { word: 'Happy', mean: '행복한' }, { word: 'Honest', mean: '정직한' }, { word: 'Humble', mean: '겸손한' }, { word: 'Hopeful', mean: '희망찬' }, { word: 'Healthy', mean: '건강한' },
+                { word: 'Harmonious', mean: '조화로운' }, { word: 'Helpful', mean: '도움이 되는' }, { word: 'Hardworking', mean: '성실한' }, { word: 'Hilarious', mean: '아주 즐거운' }, { word: 'Heroic', mean: '영웅적인' }
+            ],
+            'I': [
+                { word: 'Intelligent', mean: '지적인' }, { word: 'Imaginative', mean: '상상력이 풍부한' }, { word: 'Independent', mean: '독립적인' }, { word: 'Inspirational', mean: '영감을 주는' }, { word: 'Innovative', mean: '혁신적인' },
+                { word: 'Insightful', mean: '통찰력 있는' }, { word: 'Intuitive', mean: '직관적인' }, { word: 'Inquisitive', mean: '탐구적인' }, { word: 'Idealistic', mean: '이상적인' }, { word: 'Incredible', mean: '믿기 힘든' }
+            ],
+            'J': [
+                { word: 'Joyful', mean: '즐거운' }, { word: 'Just', mean: '공정한' }, { word: 'Jovial', mean: '명랑한' }, { word: 'Judicious', mean: '판단력 있는' }, { word: 'Jolly', mean: '행복한' },
+                { word: 'Jaunty', mean: '의기양양한' }, { word: 'Jewel-like', mean: '보석 같은' }, { word: 'Joking', mean: '농담을 잘하는' }, { word: 'Junior', mean: '젊은' }, { word: 'Journalistic', mean: '기록적인' }
+            ],
+            'K': [
+                { word: 'Kind', mean: '친절한' }, { word: 'Keen', mean: '예리한' }, { word: 'Knowledgeable', mean: '박식한' }, { word: 'Kind-hearted', mean: '마음씨 고운' }, { word: 'Knightly', mean: '기사다운' },
+                { word: 'Knotty', mean: '복잡한(문제를 잘 푸는)' }, { word: 'Kinetic', mean: '운동적인' }, { word: 'Kooky', mean: '독특한' }, { word: 'Key', mean: '핵심적인' }, { word: 'Kindred', mean: '마음이 맞는' }
+            ],
+            'L': [
+                { word: 'Lovely', mean: '사랑스러운' }, { word: 'Loyal', mean: '충성스러운' }, { word: 'Logical', mean: '논리적인' }, { word: 'Lucky', mean: '운이 좋은' }, { word: 'Luminous', mean: '빛나는' },
+                { word: 'Leader-like', mean: '지도자다운' }, { word: 'Liberal', mean: '자유로운' }, { word: 'Lively', mean: '생기 넘치는' }, { word: 'Lucid', mean: '명쾌한' }, { word: 'Limitless', mean: '무한한' }
+            ],
+            'M': [
+                { word: 'Magnificent', mean: '장엄한' }, { word: 'Modest', mean: '겸손한' }, { word: 'Mindful', mean: '주의 깊은' }, { word: 'Motivated', mean: '의욕적인' }, { word: 'Magical', mean: '마법 같은' },
+                { word: 'Meticulous', mean: '꼼꼼한' }, { word: 'Merciful', mean: '자비로운' }, { word: 'Mature', mean: '성숙한' }, { word: 'Musical', mean: '음악적인' }, { word: 'Marvelous', mean: '놀라운' }
+            ],
+            'N': [
+                { word: 'Noble', mean: '고귀한' }, { word: 'Nurturing', mean: '잘 보살피는' }, { word: 'Natural', mean: '자연스러운' }, { word: 'Neat', mean: '깔끔한' }, { word: 'Nice', mean: '좋은/친절한' },
+                { word: 'Nimble', mean: '민첩한' }, { word: 'Nifty', mean: '솜씨 좋은' }, { word: 'Noticeable', mean: '눈에 띄는' }, { word: 'Novel', mean: '참신한' }, { word: 'Nonjudgmental', mean: '비판적이지 않은' }
+            ],
+            'O': [
+                { word: 'Optimistic', mean: '낙천적인' }, { word: 'Open-minded', mean: '개방적인' }, { word: 'Outstanding', mean: '뛰어난' }, { word: 'Orderly', mean: '정돈된' }, { word: 'Original', mean: '독창적인' },
+                { word: 'Observant', mean: '관찰력 있는' }, { word: 'Objective', mean: '객관적인' }, { word: 'Obliging', mean: '친절한/협조적인' }, { word: 'Outgoing', mean: '외향적인' }, { word: 'Organized', mean: '조직적인' }
+            ],
+            'P': [
+                { word: 'Positive', mean: '긍정적인' }, { word: 'Patient', mean: '참을성 있는' }, { word: 'Passionate', mean: '열정적인' }, { word: 'Polite', mean: '예의 바른' }, { word: 'Peaceful', mean: '평화로운' },
+                { word: 'Powerful', mean: '강력한' }, { word: 'Prudent', mean: '신중한' }, { word: 'Persistent', mean: '끈기 있는' }, { word: 'Playful', mean: '장난기 많은' }, { word: 'Practical', mean: '실용적인' }
+            ],
+            'Q': [
+                { word: 'Quiet', mean: '조용한' }, { word: 'Quick', mean: '빠른' }, { word: 'Qualitative', mean: '질적인' }, { word: 'Quaint', mean: '독특하고 예쁜' }, { word: 'Quirky', mean: '개성 있는' },
+                { word: 'Quintessential', mean: '전형적인/본질적인' }, { word: 'Quizzical', mean: '기발한' }, { word: 'Qualified', mean: '자격 있는' }, { word: 'Queen-like', mean: '여왕 같은' }, { word: 'Questing', mean: '탐구하는' }
+            ],
+            'R': [
+                { word: 'Radiant', mean: '빛나는' }, { word: 'Reliable', mean: '믿음직한' }, { word: 'Respectful', mean: '예의 바른' }, { word: 'Resilient', mean: '회복력 있는' }, { word: 'Rational', mean: '합리적인' },
+                { word: 'Responsible', mean: '책임감 있는' }, { word: 'Resourceful', mean: '기지가 넘치는' }, { word: 'Refreshing', mean: '상쾌한' }, { word: 'Remarkable', mean: '주목할 만한' }, { word: 'Reassuring', mean: '안심시키는' }
+            ],
+            'S': [
+                { word: 'Sincere', mean: '진실된' }, { word: 'Smart', mean: '영리한' }, { word: 'Strong', mean: '강한' }, { word: 'Sweet', mean: '다정한' }, { word: 'Successful', mean: '성공적인' },
+                { word: 'Supportive', mean: '지지해주는' }, { word: 'Skillful', mean: '숙련된' }, { word: 'Spontaneous', mean: '자발적인' }, { word: 'Sensible', mean: '분별 있는' }, { word: 'Stunning', mean: '멋진' }
+            ],
+            'T': [
+                { word: 'Talented', mean: '재능 있는' }, { word: 'Thoughtful', mean: '생각 깊은' }, { word: 'Trustworthy', mean: '신뢰할 수 있는' }, { word: 'Tolerant', mean: '관대한' }, { word: 'Tidy', mean: '깔끔한' },
+                { word: 'Transparent', mean: '투명한/솔직한' }, { word: 'Terrific', mean: '굉장한' }, { word: 'Tenacious', mean: '끈기 있는' }, { word: 'Tactful', mean: '요령 있는' }, { word: 'Thrifty', mean: '검소한' }
+            ],
+            'U': [
+                { word: 'Unique', mean: '독특한' }, { word: 'Understanding', mean: '이해심 넓은' }, { word: 'Upbeat', mean: '긍정적인' }, { word: 'Unstoppable', mean: '멈출 수 없는' }, { word: 'Unbiased', mean: '편견 없는' },
+                { word: 'Useful', mean: '유용한' }, { word: 'Upright', mean: '강직한' }, { word: 'Ultimate', mean: '궁극적인' }, { word: 'Unforgettable', mean: '잊을 수 없는' }, { word: 'Urbane', mean: '세련된' }
+            ],
+            'V': [
+                { word: 'Valuable', mean: '가치 있는' }, { word: 'Vibrant', mean: '활기찬' }, { word: 'Versatile', mean: '다재다능한' }, { word: 'Virtuous', mean: '도덕적인' }, { word: 'Visionary', mean: '선견지명 있는' },
+                { word: 'Vigorous', mean: '활기찬' }, { word: 'Victorious', mean: '승리하는' }, { word: 'Vocal', mean: '목소리 큰/솔직한' }, { word: 'Vivid', mean: '선명한' }, { word: 'Valiant', mean: '용맹한' }
+            ],
+            'W': [
+                { word: 'Wise', mean: '지혜로운' }, { word: 'Warm', mean: '따뜻한' }, { word: 'Witty', mean: '재치 있는' }, { word: 'Wonderful', mean: '멋진' }, { word: 'Worthy', mean: '가치 있는' },
+                { word: 'Welcoming', mean: '환대하는' }, { word: 'Wealthy', mean: '풍요로운' }, { word: 'Wholehearted', mean: '전폭적인' }, { word: 'Willful', mean: '의지가 강한' }, { word: 'Winning', mean: '매력적인/이기는' }
+            ],
+            'X': [
+                { word: 'Xenic', mean: '이국적인' }, { word: 'Xenodochial', mean: '낯선 사람에게 친절한' }, { word: 'Xanthous', mean: '노란색의(밝은)' }, { word: 'X-factor', mean: '특별한 재능이 있는' }, { word: 'Xenogenic', mean: '다양한 매력의' },
+                { word: 'X-ray-like', mean: '통찰력 있는' }, { word: 'Xenophilic', mean: '새로운 것을 좋아하는' }, { word: 'Xalted', mean: '고귀한(Exalted변형)' }, { word: 'Xuberant', mean: '활기찬(Exuberant변형)' }, { word: 'Xceptional', mean: '예외적인(Exceptional변형)' }
+            ],
+            'Y': [
+                { word: 'Young', mean: '젊은' }, { word: 'Youthful', mean: '청춘의' }, { word: 'Yearning', mean: '열망하는' }, { word: 'Yielding', mean: '양보하는' }, { word: 'Yummy', mean: '매력적인' },
+                { word: 'Yare', mean: '기민한' }, { word: 'Yeomanly', mean: '충직한' }, { word: 'Yester', mean: '추억을 소중히 하는' }, { word: 'Yippee-like', mean: '즐거움이 가득한' }, { word: 'Yokefellow', mean: '협동적인' }
+            ],
+            'Z': [
+                { word: 'Zealous', mean: '열성적인' }, { word: 'Zestful', mean: '열정적인' }, { word: 'Zippy', mean: '민첩한' }, { word: 'Zenithal', mean: '정점의' }, { word: 'Zany', mean: '익살스러운' },
+                { word: 'Zesty', mean: '자극적인/흥미로운' }, { word: 'Zero-in', mean: '집중하는' }, { word: 'Zephyr-like', mean: '산들바람 같은' }, { word: 'Zappy', mean: '에너지 넘치는' }, { word: 'Zooty', mean: '멋을 부린' }
+            ]
+        };
+
+        const grid = document.getElementById('alphabet-grid');
+        const list = document.getElementById('adjective-list');
+        const container = document.getElementById('result-container');
+        const placeholder = document.getElementById('placeholder');
+        const letterDisplay = document.getElementById('selected-letter');
+
+        // 알파벳 버튼 생성
+        Object.keys(adjectivesData).forEach(letter => {
+            const btn = document.createElement('button');
+            btn.textContent = letter;
+            btn.className = 'alphabet-btn h-12 w-full flex items-center justify-center rounded-lg bg-white border border-slate-200 text-lg font-bold text-slate-700';
+            btn.onclick = () => showAdjectives(letter, btn);
+            grid.appendChild(btn);
+        });
+
+        function showAdjectives(letter, btn) {
+            // 버튼 활성화 스타일 처리
+            document.querySelectorAll('.alphabet-btn').forEach(b => b.classList.remove('active-letter'));
+            btn.classList.add('active-letter');
+
+            // 내용 업데이트
+            placeholder.classList.add('hidden');
+            container.classList.remove('hidden');
+            letterDisplay.textContent = letter;
+            
+            list.innerHTML = '';
+            adjectivesData[letter].forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 hover:bg-blue-50 hover:border-blue-100 transition-colors cursor-default';
+                card.innerHTML = `
+                    <span class="text-lg font-bold text-slate-800">${item.word}</span>
+                    <span class="text-sm text-blue-600 font-medium">${item.mean}</span>
+                `;
+                list.appendChild(card);
+            });
+
+            // 부드럽게 스크롤
+            container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
