@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이니셜 형용사 사전</title>
+    <title>가회중학교 이니셜 형용사 사전</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
@@ -24,10 +24,10 @@
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-4xl mx-auto">
+<body class="p-4 md:p-8 flex flex-col min-h-screen">
+    <div class="max-w-4xl mx-auto flex-grow">
         <header class="text-center mb-10">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">✨ 나만의 이니셜 형용사 찾기</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-4">✨ 가회중학교 학생들을 위한 이니셜 형용사 사전</h1>
             <p class="text-slate-600">이름의 첫 글자를 클릭해서 자신을 표현할 멋진 영단어를 골라보세요!</p>
         </header>
 
@@ -37,7 +37,7 @@
         </div>
 
         <!-- 결과 표시 영역 -->
-        <div id="result-container" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100">
+        <div id="result-container" class="hidden bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-slate-100 mb-10">
             <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
                 <span id="selected-letter" class="text-5xl font-black text-blue-600">A</span>
                 <div>
@@ -55,6 +55,11 @@
             위의 알파벳을 클릭하면 형용사 목록이 나타납니다.
         </div>
     </div>
+
+    <!-- 푸터 저작권 표시 -->
+    <footer class="mt-12 py-6 border-t border-slate-200 text-center text-slate-500 text-sm">
+        <p>© 2026 가회중학교 교사 강하영. All rights reserved.</p>
+    </footer>
 
     <script>
         const adjectivesData = {
